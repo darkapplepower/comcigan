@@ -1,5 +1,5 @@
 # comcigan
-comcigan for kakaobot
+comcigan for kakaobot(Rhinojs)
 comci.searchSchool(schoolName,text)
 
 /*

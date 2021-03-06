@@ -10,7 +10,7 @@ module.exports = function () {
                     .select("script")
                     .get(1)
                     .html());
-                const encodeText = String(new java.lang.String(java.util.Base64.getEncoder().encode(new java.lang.String((scData(i) + schoolId + "_0_1").toString()).getBytes())));
+                const encodeText = String(new java.lang.String(android.util.Base64.encodeToString(new java.lang.String((scData(i) + schoolId + "_0_1").toString()).getBytes(),android.util.Base64.DEFAULT)));
                 var data = String(Jsoup
                     .connect("http://comci.kr:4082" + getUrl(i).split("?")[0] + "?" + encodeText)
                     .get()

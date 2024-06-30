@@ -4,15 +4,15 @@ module.exports = function () {
         try {
             if (!isNaN(schoolId)) {
                 const i = String(Jsoup
-                    .connect("http://comci.kr:4082/st")
-                    .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36")
+                    .connect("http://comci.net:4082/st")
+                    
                     .get()
                     .select("script")
                     .get(1)
                     .html());
                 const encodeText = String(new java.lang.String(android.util.Base64.encodeToString(new java.lang.String((scData(i) + schoolId + "_0_1").toString()).getBytes(),android.util.Base64.DEFAULT)));
                 var data = String(Jsoup
-                    .connect("http://comci.kr:4082" + getUrl(i).split("?")[0] + "?" + encodeText)
+                    .connect("http://comci.net:4082" + getUrl(i).split("?")[0] + "?" + encodeText)
                     .get()
                     .text());
                 data = JSON.parse(data.replace(/\0/g, ""));
@@ -20,20 +20,23 @@ module.exports = function () {
                 const result = {};
                 result.수업시간 = JSON.parse(JSON.stringify(data.일과시간));
                 result.시간표 = [[], [], [], [], [], []];
-                let ord, dad, th, sb, na;
+                var ord, dad, th, sb, na, tt, ttt;
                 for (let t = 1; t < 9; t++) {
-                    for (let we = 1; we < 7; we++) {
+                    for (let we = 1; we < 6; we++) {
                         ord = data[zaryo[0]][grade][cl][we][t];
                         dad = data[zaryo[1]][grade][cl][we][t];
-                        th = Math.floor(dad / 100);
-                        sb = dad - th * 100;
                         if (dad > 100) {
+                          th = data.분리 == 100 ? dad / data.분리|0 : dad % data.분리;
+                          sb = data.분리 == 100 ? dad % data.분리 : dad / data.분리|0;
+                          ttt = Math.floor(sb / data.분리);
+                          tt = data.분리 == 100 ? '' : (ttt >= 1 && ttt <= 9) ? String.fromCharCode(ttt + 64) + "_" : '';
+                          sb = sb % data.분리;
                             if (th < data[zaryo[3]].length) {
                                 na = data[zaryo[4]][th].substr(0, 2);
                             } else {
                                 na = "";
                             }
-                            result.시간표[we - 1][t - 1] = (data[zaryo[5]][sb] + "(" + na + ")").toString()
+                            result.시간표[we - 1][t - 1] = (data[zaryo[5]][sb] + "(" + na + ")").toString();
                         }
                     }
                 }
@@ -47,8 +50,7 @@ module.exports = function () {
     }
     function searchSchool(schoolName, isText) {
         var result = String(Jsoup
-            .connect(("http://comci.kr:4082" + getUrl(String(Jsoup.connect("http://comci.kr:4082/st").header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36").get().select("script").get(1).html())) + java.net.URLEncoder.encode(schoolName, "EUC-KR")).toString())
-            .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36")
+            .connect(("http://comci.net:4082" + getUrl(String(Jsoup.connect("http://comci.net:4082/st").get().select("script").get(1).html())) + java.net.URLEncoder.encode(schoolName, "EUC-KR")).toString())
             .header("Referer", "http://comci.kr:4082/st")
             .get()
             .text());
@@ -86,5 +88,5 @@ module.exports = function () {
     return {
         searchSchool: searchSchool.bind(),
         getTimeTable: getTimeTable.bind()
-    }
-}()
+    };
+}();
